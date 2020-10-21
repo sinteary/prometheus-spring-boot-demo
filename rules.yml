@@ -1,0 +1,10 @@
+groups:
+- name: default
+  rules:
+  - alert: RequestRate
+    expr: rate(http_server_requests_seconds_count{uri="/modules"}[5m]) > 0
+    for: 1m # how long the rule needs to be broken for
+    labels:
+      severity: high
+    annotations:
+      summary: Application receiving too many requests

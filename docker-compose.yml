@@ -1,0 +1,56 @@
+version: "3.4"
+
+services:
+  mysql-db:
+    image: mysql:8
+    environment:
+      - MYSQL_ROOT_PASSWORD=P@ssw0rd
+      - MYSQL_PASSWORD=P@ssw0rd
+      - MYSQL_DATABASE=slotify
+    container_name: mysql-db
+    volumes:
+      - my-datavolume:/var/lib/mysql
+
+  slotify:
+    image: slotifyfinal
+    ports:
+      - 3001:3001
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/slotify?useLegacyDatetimeCode=false&serverTimezone=UTC
+    depends_on:
+      - mysql-db
+    restart: always
+    links:
+      - mysql-db
+
+  prometheus:
+    image: prom/prometheus:latest
+    depends_on:
+      - slotify
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./rules.yml:/etc/prometheus/rules.yml
+    ports:
+      - 9090:9090
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    ports:
+      - 9093:9093
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    depends_on:
+      - prometheus
+  
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
+    depends_on:
+      - prometheus
+
+
+volumes:
+  my-datavolume:

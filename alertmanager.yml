@@ -1,0 +1,11 @@
+route:
+  receiver: emailer
+receivers:
+  - name: emailer
+    email_configs:
+      - to: leewengyancynthia@gmail.com
+        from: leewengyancynthia@gmail.com
+        smarthost: smtp.gmail.com:587
+        auth_username: leewengyancynthia@gmail.com
+        auth_identity: leewengyancynthia@gmail.com
+        auth_password: ccfytjsmgsfskylt
