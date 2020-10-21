@@ -1,7 +1,10 @@
+# Slide 22: Set up configuration for Alertmanager (Step 6)
 route:
+  # Basic configuration: all alerts will go through emailer
   receiver: emailer
 receivers:
   - name: emailer
+    # Include details for sending email alert through Gmail
     email_configs:
       - to: leewengyancynthia@gmail.com
         from: leewengyancynthia@gmail.com

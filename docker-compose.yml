@@ -1,6 +1,7 @@
 version: "3.4"
 
 services:
+  # Database configuration
   mysql-db:
     image: mysql:8
     environment:
@@ -11,8 +12,10 @@ services:
     volumes:
       - my-datavolume:/var/lib/mysql
 
+  # Spring Boot Application
   slotify:
-    image: slotifyfinal
+    # image: slotifyfinal # image built using Dockerfile in ./slotify
+    build: ./slotify
     ports:
       - 3001:3001
     environment:
@@ -23,30 +26,39 @@ services:
     links:
       - mysql-db
 
+  # Slide 19: Configuring and running prometheus (Step 3)
+  # Run prometheus as a container alongside application
   prometheus:
     image: prom/prometheus:latest
     depends_on:
       - slotify
     volumes:
+      # Include prometheus.yml configuration file
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - ./rules.yml:/etc/prometheus/rules.yml
     ports:
       - 9090:9090
 
+  # Slide 22: Run Alertmanager (Step 7)
+  # Run prometheus as a container alongside application
   alertmanager:
     image: prom/alertmanager:latest
     ports:
       - 9093:9093
     volumes:
+      # Include alertmanager.yml configuration file
       - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
     depends_on:
       - prometheus
   
+  # Slide 22: Run Grafana (Step 9)
+  # Run Grafana as a container alongside Prometheus and application
   grafana:
     image: grafana/grafana
     ports:
       - 3000:3000
     volumes:
+      # Include datasource.yml configuration file
       - ./datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
     depends_on:
       - prometheus

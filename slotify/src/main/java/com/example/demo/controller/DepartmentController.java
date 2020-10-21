@@ -21,23 +21,28 @@ import io.prometheus.client.CollectorRegistry;
 public class DepartmentController {
 	@Autowired
 	private DepartmentService deptService;
+	
+	// Prometheus Counter that tracks total number of requests made for departments.
 	private final Counter requestCount;
 	
 	public DepartmentController(CollectorRegistry collectorRegistry) {
+		// Instantiate the Counter
 		requestCount = Counter.build()
-			.name("requests_departments_total")
-			.help("Total requests for departments.")
-			.register(collectorRegistry);
+			.name("requests_departments_total") // Metric name
+			.help("Total requests for departments.") // Metric description
+			.register(collectorRegistry); // Bind it to official Spring Boot Collector Registry
 	}
 	
 	@GetMapping("/departments/{deptId}")
 	public Department getDepartmentById(@PathVariable int id) {
+		// Increment the request counter each time a request is made
 		requestCount.inc();
 		return deptService.getDepartmentById(id);
 	}
 	
 	@GetMapping("/departments")
 	public List<Department> getDepartments() {
+		// Increment the request counter each time a request is made
 		requestCount.inc();
 		return deptService.getDepartments();
 	}
@@ -50,12 +55,14 @@ public class DepartmentController {
 	
 	@PutMapping("/departments/{deptId}")
 	public Department updateDepartment(@PathVariable int deptId, @RequestBody Department department) {
+		requestCount.inc();
 		department.setId(deptId);
 		return deptService.addOrUpdateDepartment(department);
 	}
 	
 	@DeleteMapping("/departments/{deptId}")
 	public Department deleteDepartmentById(@PathVariable int id) {
+		requestCount.inc();
 		return deptService.deleteDepartment(id);
 	}
 	

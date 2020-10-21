@@ -15,27 +15,45 @@ import com.example.demo.model.ModuleCore;
 import com.example.demo.service.ModuleService;
 
 import io.prometheus.client.Histogram;
+import io.prometheus.client.Summary;
 import io.prometheus.client.CollectorRegistry;
 
 @RestController
 public class ModuleController {
 	@Autowired
 	private ModuleService moduleService;
+
+	/**
+		Prometheus Histogram that tracks the frequency of response durations that
+		fall into previously defined buckets
+	*/
 	private final Histogram requestDuration;
+	
+	private final Summary requestDurationSummary;
 	
 	public ModuleController(CollectorRegistry collectorRegistry) {
 		requestDuration = Histogram.build()
+			// Default buckets are tailored to measure network response durations (less than 10s)
+			// Users can initialize their own bucket values as shown below
 			.buckets(0.005, 0.01, 0.015, 0.02, 0.025, 0.03, 0.035, 0.04)
 			.name("request_modules_duration")
 			.help("Time taken for requests for modules.")
+			.register(collectorRegistry);
+		
+		requestDurationSummary = Summary.build()
+			.name("request_modules_duration_summary")
+			.help("Time taken for requests for modules (summary).")
+			.quantile(0.95, 0.01)
 			.register(collectorRegistry);
 	}
 	
 	@GetMapping("/modules")
 	public List<ModuleCore> getAllModuleCores() {
-		Histogram.Timer timer = requestDuration.startTimer();
+		Histogram.Timer timer_histogram = requestDuration.startTimer(); // Begin timing
+		Summary.Timer timer_summary = requestDurationSummary.startTimer();
 		List<ModuleCore> modules = moduleService.getAllModules();
-		timer.observeDuration();
+		timer_histogram.observeDuration(); // Record time taken
+		timer_summary.observeDuration(); 
 		return modules;	
 	}
 	

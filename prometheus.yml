@@ -1,18 +1,25 @@
 global:
-  scrape_interval: 15s
-  evaluation_interval: 15s
+  scrape_interval: 15s # How often Prometheus scrapes metrics
+  evaluation_interval: 15s # How often Prometheus evaluates rules
 
+# Slide 19: Configuring and running prometheus (Step 2)
+# Configure targets that Prometheus should monitor/scrape metrics from
+# Required for most basic configuration
 scrape_configs:
   - job_name: "slotify"
     metrics_path: "/actuator/prometheus"
     static_configs:
       - targets: ["slotify:3001"]
 
+# ---------------------- ALERTING ---------------------------------
+# Slide 22: Alerting - Configure prometheus.yml (Step 5)
+# Include rule files for recording and alerting rules
+rule_files:
+  - "rules.yml"
+
+# Establish a connection to Alertmanager
 alerting:
   alertmanagers:
     - static_configs:
       - targets:
         - alertmanager:9093
-
-rule_files:
-  - "rules.yml"
