@@ -26,7 +26,7 @@ services:
     links:
       - mysql-db
 
-  # Slide 19: Configuring and running prometheus (Step 3)
+  # Slide 18: Configuring and running prometheus (Step 3)
   # Run prometheus as a container alongside application
   prometheus:
     image: prom/prometheus:latest
@@ -39,8 +39,8 @@ services:
     ports:
       - 9090:9090
 
-  # Slide 22: Run Alertmanager (Step 7)
-  # Run prometheus as a container alongside application
+  # Slide 21: Run Alertmanager (Step 7)
+  # Run alertmanger as a container alongside the application and Prometheus
   alertmanager:
     image: prom/alertmanager:latest
     ports:
@@ -51,7 +51,7 @@ services:
     depends_on:
       - prometheus
   
-  # Slide 22: Run Grafana (Step 9)
+  # Slide 24: Run Grafana (Step 9)
   # Run Grafana as a container alongside Prometheus and application
   grafana:
     image: grafana/grafana

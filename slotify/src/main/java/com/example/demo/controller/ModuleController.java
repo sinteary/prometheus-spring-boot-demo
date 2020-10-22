@@ -25,15 +25,18 @@ public class ModuleController {
 
 	/**
 		Prometheus Histogram that tracks the frequency of response durations that
-		fall into previously defined buckets
+		fall into pre-defined buckets
 	*/
 	private final Histogram requestDuration;
 	
+	/**
+		Prometheus Summary that tracks the 95th percentile of response times for GET /modules.
+	*/
 	private final Summary requestDurationSummary;
 	
 	public ModuleController(CollectorRegistry collectorRegistry) {
 		requestDuration = Histogram.build()
-			// Default buckets are tailored to measure network response durations (less than 10s)
+			// By default: 10 buckets measuring network response durations (less than 10s)
 			// Users can initialize their own bucket values as shown below
 			.buckets(0.005, 0.01, 0.015, 0.02, 0.025, 0.03, 0.035, 0.04)
 			.name("request_modules_duration")
@@ -43,6 +46,7 @@ public class ModuleController {
 		requestDurationSummary = Summary.build()
 			.name("request_modules_duration_summary")
 			.help("Time taken for requests for modules (summary).")
+			// Track 95th percentile, with 1% tolerated error
 			.quantile(0.95, 0.01)
 			.register(collectorRegistry);
 	}
@@ -50,10 +54,10 @@ public class ModuleController {
 	@GetMapping("/modules")
 	public List<ModuleCore> getAllModuleCores() {
 		Histogram.Timer timer_histogram = requestDuration.startTimer(); // Begin timing
-		Summary.Timer timer_summary = requestDurationSummary.startTimer();
+		Summary.Timer timer_summary = requestDurationSummary.startTimer(); // Begin timing
 		List<ModuleCore> modules = moduleService.getAllModules();
 		timer_histogram.observeDuration(); // Record time taken
-		timer_summary.observeDuration(); 
+		timer_summary.observeDuration(); // Record time taken
 		return modules;	
 	}
 	

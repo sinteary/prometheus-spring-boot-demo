@@ -30,7 +30,7 @@ public class DepartmentController {
 		requestCount = Counter.build()
 			.name("requests_departments_total") // Metric name
 			.help("Total requests for departments.") // Metric description
-			.register(collectorRegistry); // Bind it to official Spring Boot Collector Registry
+			.register(collectorRegistry); // Bind it to default Spring Boot Collector Registry
 	}
 	
 	@GetMapping("/departments/{deptId}")

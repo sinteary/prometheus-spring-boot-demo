@@ -1,4 +1,4 @@
-# Slide 22: Set up configuration for Alertmanager (Step 6)
+# Slide 21: Set up configuration for Alertmanager (Step 6)
 route:
   # Basic configuration: all alerts will go through emailer
   receiver: emailer
